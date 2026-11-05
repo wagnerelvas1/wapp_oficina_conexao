@@ -15,3 +15,7 @@ npm run dev
 - `src/components/Layout.tsx` — header, sidebar e footer navegáveis
 - `src/pages/Inicio.tsx` — input de nome gravando na tabela `nomes` do Supabase
 - `supabase/migrations/` — SQL da tabela `nomes` (com RLS)
+
+## Deploy
+
+Produção: https://wapp-oficina-conexao.vercel.app (deploy automático a cada push na `main`).
