@@ -6,11 +6,12 @@ type Nome = { id: number; nome: string }
 export default function Inicio() {
   const [nome, setNome] = useState('')
   const [nomes, setNomes] = useState<Nome[]>([])
-  const [msg, setMsg] = useState('')
+  const [msg, setMsg] = useState<{ erro: boolean; texto: string } | null>(null)
+  const [salvando, setSalvando] = useState(false)
 
   const carregar = async () => {
     const { data, error } = await supabase.from('nomes').select('id, nome').order('id', { ascending: false }).limit(10)
-    if (error) setMsg(`Erro: ${error.message}`)
+    if (error) setMsg({ erro: true, texto: error.message })
     else setNomes(data)
   }
 
@@ -19,21 +20,35 @@ export default function Inicio() {
   const salvar = async (e: FormEvent) => {
     e.preventDefault()
     if (!nome.trim()) return
+    setSalvando(true)
     const { error } = await supabase.from('nomes').insert({ nome: nome.trim() })
-    setMsg(error ? `Erro: ${error.message}` : 'Nome salvo no Supabase ✅')
+    setSalvando(false)
+    setMsg(error ? { erro: true, texto: error.message } : { erro: false, texto: 'Nome salvo.' })
     if (!error) { setNome(''); carregar() }
   }
 
   return (
-    <section>
-      <h1>Início</h1>
-      <form onSubmit={salvar} className="form">
+    <section className="pagina">
+      <header>
+        <h1>Início</h1>
+        <p>Cadastre um nome para testar a conexão com o Supabase.</p>
+      </header>
+
+      <form onSubmit={salvar} className="card form">
         <label htmlFor="nome">Nome</label>
-        <input id="nome" value={nome} onChange={e => setNome(e.target.value)} placeholder="Digite um nome" maxLength={100} />
-        <button type="submit">Salvar</button>
+        <div className="linha">
+          <input id="nome" value={nome} onChange={e => setNome(e.target.value)} placeholder="Ex.: Maria Silva" maxLength={100} autoComplete="off" />
+          <button type="submit" disabled={salvando || !nome.trim()}>{salvando ? 'Salvando…' : 'Salvar'}</button>
+        </div>
+        {msg && <p className={`msg ${msg.erro ? 'erro' : ''}`}>{msg.texto}</p>}
       </form>
-      {msg && <p className="msg">{msg}</p>}
-      <ul className="lista">{nomes.map(n => <li key={n.id}>{n.nome}</li>)}</ul>
+
+      {nomes.length > 0 && (
+        <div className="card">
+          <h2>Últimos nomes</h2>
+          <ul className="lista">{nomes.map(n => <li key={n.id}>{n.nome}</li>)}</ul>
+        </div>
+      )}
     </section>
   )
 }

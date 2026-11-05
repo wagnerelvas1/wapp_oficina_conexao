@@ -4,7 +4,10 @@ import { links } from './components/links'
 import Inicio from './pages/Inicio'
 
 const Mock = ({ titulo }: { titulo: string }) => (
-  <section><h1>{titulo}</h1><p>Página de teste (mock).</p></section>
+  <section className="pagina">
+    <header><h1>{titulo}</h1><p>Página de teste (mock).</p></header>
+    <div className="card vazio">Nada por aqui ainda.</div>
+  </section>
 )
 
 export default function App() {
